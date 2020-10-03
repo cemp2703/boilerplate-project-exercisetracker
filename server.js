@@ -135,7 +135,20 @@ app.get('/api/exercise/log',(req,res)=>{
     User.findById(req.query.userId,(err, user)=>{
       if(err) return done(err);
       if(user !== null){
-        UserExercise.find({userId:req.query.userId},{ description: 1, duration: 1 ,date:1,_id:0},(err, exercise)=>{
+        let query  = { userId:req.query.userId}
+        if(req.query.from&&req.query.to)
+          query.date = { $gte: req.query.from, $lte: req.query.to }
+        else if(req.query.from&&!req.query.to )
+          query.date = { $gte: req.query.from}
+        else if(!req.query.from&&req.query.to )
+          query.date = { $lte: req.query.to}
+        else{
+
+        }
+        let filt = UserExercise.find(query,{ description: 1, duration: 1 ,date:1,_id:0}).sort({ date: 'asc'});
+        if(req.query.limit)
+          filt = filt.limit(parseInt(req.query.limit))
+        filt.exec((err, exercise)=>{
           if(err) return done(err);
           let exer = []
           for(let e of exercise){
