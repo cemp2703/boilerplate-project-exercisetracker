@@ -146,7 +146,7 @@ app.get('/api/exercise/log',(req,res)=>{
 
         }
         let filt = UserExercise.find(query,{ description: 1, duration: 1 ,date:1,_id:0}).sort({ date: 'asc'});
-        if(req.query.limit)
+        if(parseInt(req.query.limit) instanceof Number)
           filt = filt.limit(parseInt(req.query.limit))
         filt.exec((err, exercise)=>{
           if(err) return done(err);
